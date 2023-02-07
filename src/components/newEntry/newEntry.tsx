@@ -6,17 +6,17 @@ import AddIcon from '@mui/icons-material/Add';
 import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
 import { EntriesContext } from '../../context/Entries/EntriesContext';
+import { UiContext } from '@/context/UI/UiContext';
 const NewEntry = () => {
-
-    const [isAdding, setIsAdding] = useState<boolean>(false);
+    const { isAddingEntry, setIsAddingEntry } = useContext(UiContext)
+    const { addEntry } = useContext(EntriesContext)
     const [inputValue, setInputValue] = useState('');
     const [Touched, setTouched] = useState(false);
-    const { addEntry } = useContext(EntriesContext)
 
     const onSave = () => {
         if (inputValue.length === 0) return;
         addEntry(inputValue)
-        setIsAdding(false)
+        // setIsAdding(false)
         setInputValue('')
     }
 
@@ -25,7 +25,7 @@ const NewEntry = () => {
             marginBottom: 2, paddingX: 2, paddingY: 2
         }}>
             {
-                isAdding ? (
+                isAddingEntry ? (
                     <>
                         <TextField
                             fullWidth
@@ -48,7 +48,7 @@ const NewEntry = () => {
                             <Button variant='outlined' color='secondary' endIcon={<SaveOutlinedIcon />} onClick={onSave}>
                                 Save
                             </Button>
-                            <Button variant='outlined' color='error' endIcon={<CancelIcon />} onClick={() => setIsAdding(false)}>
+                            <Button variant='outlined' color='error' endIcon={<CancelIcon />} onClick={() => setIsAddingEntry(false)}>
                                 Cancel
                             </Button>
                         </Box>
@@ -59,7 +59,7 @@ const NewEntry = () => {
                         variant='outlined'
                         fullWidth
                         color='primary'
-                        onClick={() => setIsAdding(true)}
+                        onClick={() => setIsAddingEntry(true)}
                     >
                         Add Entry
                     </Button>

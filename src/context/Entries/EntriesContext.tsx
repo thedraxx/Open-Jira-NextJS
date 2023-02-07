@@ -6,6 +6,7 @@ export interface UIContextProps {
 
     // Methods
     addEntry: (description: string) => void;
+    updateEntry(entry: Entry): void;
 }
 
 export const EntriesContext = createContext({} as UIContextProps);
