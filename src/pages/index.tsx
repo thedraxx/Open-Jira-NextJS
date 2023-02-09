@@ -7,6 +7,11 @@ import NewEntry from '../components/newEntry/newEntry';
 
 
 export default function Home() {
+
+  // console.log('process.env', process.env.NEXT_PUBLIC_API_URL)
+
+
+
   return (
     <Layout title="Home - Open Jira">
       <Grid container spacing={2}>
