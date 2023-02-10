@@ -57,11 +57,22 @@ export const EntriesProvider = ({ children }: Props) => {
         });
     };
 
-    const updateEntry = (entry: Entry) => {
-        dispatch({
-            type: "[Entries] - Entry-Updated",
-            payload: entry,
-        })
+    // Cambia el estado de una entrada (pending, completed, in progress)
+    const updateEntry = async (entry: Entry) => {
+
+        try {
+
+            const { data } = await entriesAPI.put<Entry>(`/entries/${entry._id}`, entry)
+
+            dispatch({
+                type: "[Entries] - Entry-Updated",
+                payload: data,
+            })
+        } catch (error) {
+            console.log(error)
+        }
+
+
     }
 
     return (
