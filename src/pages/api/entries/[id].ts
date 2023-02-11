@@ -12,6 +12,8 @@ export default function handler(
 ) {
   const { id } = req.query;
 
+  console.log(req.query);
+
   if (!mongoose.isValidObjectId(id)) {
     return res.status(400).json({ message: "Invalid ID" + id });
   }
