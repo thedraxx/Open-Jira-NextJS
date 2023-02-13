@@ -3,6 +3,7 @@ export interface Entry {
   description: string;
   createdAt: number;
   status: EntryStatus;
+  showSnackBar?: boolean;
 }
 
 export type EntryStatus = "pending" | "in-progress" | "finished";

@@ -1,17 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useContext } from 'react'
 import Layout from '../../components/layouts/Layout';
 import { capitalize, Card, Grid, CardHeader, CardContent, CardActions, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { EntryStatus } from '@/interfaces';
 import DeletedOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import { GetServerSideProps } from 'next'
+import { dbEntries } from '@/database';
+import { Entry } from '../../interfaces/entry';
+import { EntriesContext } from '@/context/Entries/EntriesContext';
+import { getFormatDistanceToNow } from '@/utils/DateFunctions';
+
 const validStatus: EntryStatus[] = ["finished", "pending", "in-progress"]
 
-const EntryPage = () => {
+interface Props {
+    entry: Entry
+}
 
-    const [inputValue, setInputValue] = useState("")
-    const [status, setStatus] = useState<EntryStatus>("pending")
+
+const EntryPage = ({ entry }: Props) => {
+
+    const { updateEntry } = useContext(EntriesContext)
+
+
+    const [inputValue, setInputValue] = useState(entry.description)
+    const [status, setStatus] = useState<EntryStatus>(entry.status)
     const [touched, setTouched] = useState(false);
+
+    const isNotValid = useMemo(() => inputValue.length <= 0 && touched, [touched, inputValue])
 
     const onInputValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
@@ -24,17 +40,21 @@ const EntryPage = () => {
     const onSave = () => {
         if (inputValue.length === 0) return;
         setTouched(true)
-        console.log(inputValue, status)
+        updateEntry({
+            ...entry,
+            description: inputValue,
+            status
+        }, true);
     }
 
     return (
-        <Layout title='.......'>
+        <Layout title={inputValue.substring(0, 20) + "..."}>
             <Grid container justifyContent='center' sx={{ marginTop: 2 }}>
                 <Grid item xs={12} sm={8} md={6}>
                     <Card>
                         <CardHeader
-                            title={`${inputValue}`}
-                            subheader={`Creada hace .... minutos`} />
+                            title={`Entrada:`}
+                            subheader={getFormatDistanceToNow(entry.createdAt)} />
                         <CardContent>
                             <TextField
                                 sx={{
@@ -49,6 +69,10 @@ const EntryPage = () => {
                                 label="new input"
                                 value={inputValue}
                                 onChange={onInputValueChange}
+                                onBlur={() => setTouched(true)}
+                                onFocus={() => setTouched(false)}
+                                helperText={isNotValid ? "El campo es requerido" : ""}
+                                error={isNotValid}
                             />
                             {/** RADIO */}
                             <FormControl>
@@ -77,6 +101,7 @@ const EntryPage = () => {
                                 variant="contained"
                                 fullWidth
                                 onClick={onSave}
+                                disabled={isNotValid}
                             >
                                 Guardar
                             </Button>
@@ -97,6 +122,29 @@ const EntryPage = () => {
             </IconButton>
         </Layout>
     )
+}
+
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+
+    const entry = await dbEntries.getEntryById(ctx.params?.id as string);
+
+    if (!entry) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: {
+            entry
+        }
+    }
 }
 
 export default EntryPage

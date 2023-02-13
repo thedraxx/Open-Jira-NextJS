@@ -6,7 +6,7 @@ import { Entry } from '@/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { darkTheme } from '@/themes';
 import { entriesAPI } from '@/apis';
-
+import { useSnackbar } from 'notistack';
 
 export interface entriesState {
     entries: Entry[];
@@ -23,6 +23,8 @@ interface Props {
 export const EntriesProvider = ({ children }: Props) => {
 
     const [state, dispatch] = useReducer(EntriesReducer, entries_INITIAL_STATE);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const refreshEntries = async () => {
         const { data } = await entriesAPI<Entry[]>('/entries');
@@ -58,7 +60,7 @@ export const EntriesProvider = ({ children }: Props) => {
     };
 
     // Cambia el estado de una entrada (pending, completed, in progress)
-    const updateEntry = async (entry: Entry) => {
+    const updateEntry = async (entry: Entry, showSnackBar = false) => {
 
         try {
 
@@ -68,6 +70,17 @@ export const EntriesProvider = ({ children }: Props) => {
                 type: "[Entries] - Entry-Updated",
                 payload: data,
             })
+            if (showSnackBar) {
+                enqueueSnackbar('Entrada actualizada', {
+                    variant: 'success',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'right',
+                    },
+                    autoHideDuration: 2000,
+                })
+            }
+
         } catch (error) {
             console.log(error)
         }
