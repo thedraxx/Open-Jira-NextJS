@@ -6,12 +6,9 @@ import { EntriesProvider } from '../context/Entries/EntriesProvider';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-
-
-
     <UiProvider>
       <EntriesProvider>
-        < ThemeProvider theme={darkTheme}>
+        < ThemeProvider theme={lightTheme}>
           <CssBaseline />
           <Component {...pageProps} />
         </ThemeProvider>
